@@ -1,16 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { TaskTable } from '@/components/dashboard/TaskTable';
 import { CreateTaskModal } from '@/components/dashboard/CreateTaskModal';
 import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { Task } from '@/types';
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    } else if (!isAdmin) {
+      router.push('/user/dashboard');
+    }
+  }, [isAuthenticated, isAdmin, router]);
+
+  // Don't render if redirecting
+  if (!isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   const fetchData = async () => {
     try {

@@ -3,6 +3,9 @@ import { LoginDto, LoginResponse, Task, CreateTaskDto, UpdateTaskDto, AuditLog }
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class ApiClient {
+  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private CACHE_DURATION = 5000; // 5 seconds cache
+
   private getHeaders() {
     const token = typeof window !== 'undefined'
       ? localStorage.getItem('token')
@@ -14,7 +17,16 @@ class ApiClient {
     };
   }
 
-  async request(endpoint: string, options?: RequestInit) {
+  async request(endpoint: string, options?: RequestInit, useCache = true) {
+    // Check cache for GET requests
+    if (useCache && (!options || options.method === 'GET')) {
+      const cacheKey = `${endpoint}`;
+      const cached = this.cache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+        return cached.data;
+      }
+    }
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers: this.getHeaders(),
@@ -25,7 +37,15 @@ class ApiClient {
       throw new Error(error.message || 'API request failed');
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // Cache GET requests
+    if (useCache && (!options || options.method === 'GET')) {
+      const cacheKey = `${endpoint}`;
+      this.cache.set(cacheKey, { data, timestamp: Date.now() });
+    }
+
+    return data;
   }
 
   // Auth endpoints

@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   role: 'ADMIN' | 'USER';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type TaskStatus = 'PENDING' | 'PROCESSING' | 'DONE';

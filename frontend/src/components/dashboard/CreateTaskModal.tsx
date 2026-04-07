@@ -24,7 +24,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
   // Fetch users when modal opens
   useEffect(() => {
     const fetchUsers = async () => {
-      if (isOpen) {
+      if (isOpen && users.length === 0) {
         try {
           setFetchingUsers(true);
           const usersData = await api.getUsers();
@@ -39,7 +39,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
     };
 
     fetchUsers();
-  }, [isOpen]);
+  }, [isOpen, users.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
