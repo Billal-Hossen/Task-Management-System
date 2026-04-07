@@ -30,6 +30,11 @@ export interface AuditLog {
   entityId: string;
   relevantData: Record<string, any>;
   createdAt: string;
+  // Formatted fields from backend
+  timestamp?: string;
+  username?: string;
+  action?: string;
+  details?: string;
 }
 
 export interface CreateTaskDto {

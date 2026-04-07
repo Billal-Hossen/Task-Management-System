@@ -21,26 +21,31 @@ export default function AuditLogsPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  // Don't render if redirecting
-  if (!isAuthenticated || !isAdmin) {
-    return null;
-  }
-
   const fetchData = async () => {
     try {
       const logsData = await api.getAuditLogs();
       setAuditLogs(logsData);
     } catch (error: any) {
-      console.error('Failed to fetch audit logs:', error);
-      alert(error.message || 'Failed to load audit logs');
+      // Silently ignore "No authentication token" errors (happens during logout)
+      if (error.message !== 'No authentication token') {
+        console.error('Failed to fetch audit logs:', error);
+        alert(error.message || 'Failed to load audit logs');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated && isAdmin) {
+      fetchData();
+    }
+  }, [isAuthenticated, isAdmin]);
+
+  // Don't render if redirecting
+  if (!isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   if (loading) {
     return (

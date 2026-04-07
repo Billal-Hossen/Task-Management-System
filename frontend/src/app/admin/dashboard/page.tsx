@@ -25,18 +25,16 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  // Don't render if redirecting
-  if (!isAuthenticated || !isAdmin) {
-    return null;
-  }
-
   const fetchData = async () => {
     try {
       const tasksData = await api.getTasks();
       setTasks(tasksData);
     } catch (error: any) {
-      console.error('Failed to fetch data:', error);
-      alert(error.message || 'Failed to load data');
+      // Silently ignore "No authentication token" errors (happens during logout)
+      if (error.message !== 'No authentication token') {
+        console.error('Failed to fetch data:', error);
+        alert(error.message || 'Failed to load data');
+      }
     } finally {
       setLoading(false);
     }
@@ -55,8 +53,15 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated && isAdmin) {
+      fetchData();
+    }
+  }, [isAuthenticated, isAdmin]);
+
+  // Don't render if redirecting
+  if (!isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   if (loading) {
     return (

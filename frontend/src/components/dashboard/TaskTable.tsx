@@ -10,26 +10,66 @@ interface TaskTableProps {
 
 export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
   const handleDelete = async (id: string) => {
+    if (!id) return;
+
     if (confirm('Are you sure you want to delete this task?')) {
       try {
         await api.deleteTask(id);
-        onRefresh();
+        onRefresh?.();
       } catch (error: any) {
-        alert(error.message || 'Failed to delete task');
+        console.error('Delete error:', error);
+        // Show error only if it's not a "no authentication token" error
+        if (error.message !== 'No authentication token') {
+          alert(error.message || 'Failed to delete task');
+        }
       }
     }
   };
 
-  const getStatusColor = (status: TaskStatus) => {
+  const getStatusBadge = (status?: TaskStatus) => {
+    if (!status) {
+      return {
+        label: 'Unknown',
+        style: {
+          backgroundColor: '#e5e7eb',
+          color: '#374151',
+        },
+      };
+    }
+
     switch (status) {
       case 'PENDING':
-        return 'bg-gray-200 text-gray-800';
+        return {
+          label: 'Todo',
+          style: {
+            backgroundColor: '#fed7aa',
+            color: '#92400e',
+          },
+        };
       case 'PROCESSING':
-        return 'bg-green-200 text-green-800';
+        return {
+          label: 'In Progress',
+          style: {
+            backgroundColor: '#d1fae5',
+            color: '#065f46',
+          },
+        };
       case 'DONE':
-        return 'bg-blue-200 text-blue-800';
+        return {
+          label: 'Done',
+          style: {
+            backgroundColor: '#d1fae5',
+            color: '#065f46',
+          },
+        };
       default:
-        return 'bg-gray-200 text-gray-800';
+        return {
+          label: status,
+          style: {
+            backgroundColor: '#e5e7eb',
+            color: '#374151',
+          },
+        };
     }
   };
 
@@ -53,29 +93,52 @@ export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {tasks.map((task) => (
-            <tr key={task.id} className="hover:bg-gray-50">
+          {tasks?.map((task) => (
+            <tr key={task?.id || Math.random()} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{task.title}</div>
-                <div className="text-sm text-gray-500">{task.description}</div>
+                <div className="text-sm font-medium text-gray-900">{task?.title || 'Untitled'}</div>
+                <div className="text-sm text-gray-500">{task?.description || ''}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
-                  {task.assignedTo?.email || 'Unassigned'}
+                  {task?.assignedTo?.email || 'Unassigned'}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(task.status)}`}>
-                  {task.status}
+                <span
+                  className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  style={getStatusBadge(task?.status)?.style}
+                >
+                  {getStatusBadge(task?.status)?.label || task?.status || 'Unknown'}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button className="text-blue-600 hover:text-blue-900 mr-4">
+                <button
+                  className="px-3 py-1 rounded mr-2 text-white font-medium"
+                  style={{
+                    backgroundColor: '#2563eb',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (e.currentTarget) e.currentTarget.style.backgroundColor = '#1d4ed8';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (e.currentTarget) e.currentTarget.style.backgroundColor = '#2563eb';
+                  }}
+                >
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(task.id)}
-                  className="text-red-600 hover:text-red-900"
+                  onClick={() => task?.id && handleDelete(task.id)}
+                  className="px-3 py-1 rounded text-white font-medium"
+                  style={{
+                    backgroundColor: '#ef4444',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (e.currentTarget) e.currentTarget.style.backgroundColor = '#dc2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (e.currentTarget) e.currentTarget.style.backgroundColor = '#ef4444';
+                  }}
                 >
                   Delete
                 </button>
@@ -85,11 +148,11 @@ export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
         </tbody>
       </table>
 
-      {tasks.length === 0 && (
+      {!tasks || tasks.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           No tasks found
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

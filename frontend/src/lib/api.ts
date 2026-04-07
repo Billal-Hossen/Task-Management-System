@@ -18,34 +18,46 @@ class ApiClient {
   }
 
   async request(endpoint: string, options?: RequestInit, useCache = true) {
-    // Check cache for GET requests
-    if (useCache && (!options || options.method === 'GET')) {
-      const cacheKey = `${endpoint}`;
-      const cached = this.cache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-        return cached.data;
+    try {
+      // Check if token exists for authenticated requests (except login)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token && !endpoint.includes('/auth/login')) {
+        // Silent fail - no token means user is logged out
+        throw new Error('No authentication token');
       }
+
+      // Check cache for GET requests
+      if (useCache && (!options || options.method === 'GET')) {
+        const cacheKey = `${endpoint}`;
+        const cached = this.cache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+          return cached.data;
+        }
+      }
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'API request failed' }));
+        throw new Error(error.message || 'API request failed');
+      }
+
+      const data = await response.json();
+
+      // Cache GET requests
+      if (useCache && (!options || options.method === 'GET')) {
+        const cacheKey = `${endpoint}`;
+        this.cache.set(cacheKey, { data, timestamp: Date.now() });
+      }
+
+      return data;
+    } catch (error: any) {
+      // Re-throw the error to be handled by the caller
+      throw error;
     }
-
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: this.getHeaders(),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'API request failed');
-    }
-
-    const data = await response.json();
-
-    // Cache GET requests
-    if (useCache && (!options || options.method === 'GET')) {
-      const cacheKey = `${endpoint}`;
-      this.cache.set(cacheKey, { data, timestamp: Date.now() });
-    }
-
-    return data;
   }
 
   // Auth endpoints

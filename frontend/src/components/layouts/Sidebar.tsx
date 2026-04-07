@@ -13,21 +13,28 @@ export function Sidebar() {
   };
 
   const adminNavItems = [
-    { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-    { label: 'Audit Logs', href: '/admin/audit', icon: '📝' },
-    { label: 'Users', href: '/admin/users', icon: '👥' },
+    { label: 'Dashboard', href: '/admin/dashboard' },
+    { label: 'Audit Logs', href: '/admin/audit' },
+    { label: 'Users', href: '/admin/users' },
   ];
 
   const userNavItems = [
-    { label: 'Dashboard', href: '/user/dashboard', icon: '🏠' },
-    { label: 'My Tasks', href: '/user/tasks', icon: '📋' },
+    { label: 'User Dashboard', href: '/user/dashboard' },
+    { label: 'My Tasks', href: '/user/dashboard' },
   ];
 
   const navItems = isAdmin ? adminNavItems : userNavItems;
 
   return (
-    <aside className="w-64 bg-primary text-white flex flex-col">
-      <div className="p-6 border-b border-blue-600">
+    <aside
+      className="flex flex-col text-white"
+      style={{
+        width: '240px',
+        backgroundColor: '#2563eb',
+        minHeight: '100vh',
+      }}
+    >
+      <div className="p-6 border-b" style={{ borderColor: '#1d4ed8' }}>
         <h1 className="text-xl font-bold">{getSidebarTitle()}</h1>
       </div>
 
@@ -36,25 +43,31 @@ export function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center px-6 py-3 transition-colors ${
+            className={`block px-6 py-3 transition-colors ${
               pathname === item.href
-                ? 'bg-blue-700 border-r-4 border-white'
-                : 'hover:bg-blue-700'
+                ? 'font-bold border-r-4'
+                : 'hover:opacity-90'
             }`}
+            style={
+              pathname === item.href
+                ? {
+                    backgroundColor: '#1d4ed8',
+                    borderColor: '#ffffff',
+                  }
+                : {}
+            }
           >
-            <span className="mr-3 text-xl">{item.icon}</span>
-            <span>{item.label}</span>
+            {item.label}
           </Link>
         ))}
       </nav>
 
-      <div className="p-4 border-t border-blue-600">
+      <div className="p-4 border-t" style={{ borderColor: '#1d4ed8' }}>
         <Link
           href="/profile"
-          className="flex items-center px-2 py-2 hover:bg-blue-700 rounded transition-colors"
+          className="block px-6 py-3 hover:opacity-90 transition-colors"
         >
-          <span className="text-xl mr-3">👤</span>
-          <span>Profile</span>
+          Profile
         </Link>
       </div>
     </aside>

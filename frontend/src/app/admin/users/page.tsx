@@ -20,26 +20,31 @@ export default function UsersPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  // Don't render if redirecting
-  if (!isAuthenticated || !isAdmin) {
-    return null;
-  }
-
   const fetchData = async () => {
     try {
       const usersData = await api.getUsers();
       setUsers(usersData);
     } catch (error: any) {
-      console.error('Failed to fetch users:', error);
-      alert(error.message || 'Failed to load users');
+      // Silently ignore "No authentication token" errors (happens during logout)
+      if (error.message !== 'No authentication token') {
+        console.error('Failed to fetch users:', error);
+        alert(error.message || 'Failed to load users');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated && isAdmin) {
+      fetchData();
+    }
+  }, [isAuthenticated, isAdmin]);
+
+  // Don't render if redirecting
+  if (!isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   const getRoleColor = (role: string) => {
     switch (role) {
