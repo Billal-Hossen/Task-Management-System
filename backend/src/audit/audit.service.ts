@@ -70,10 +70,10 @@ export class AuditService {
 
     switch (log.actionType) {
       case ActionType.CREATE:
-        if (log.entityType === 'Task') {
+        if (log.entityType === 'Tasks') {
           return {
             action: 'Task Created',
-            details: `Task Created: '${data.title || 'N/A'}'`,
+            details: `"${data.title || 'N/A'}"`, // Just title in quotes
           };
         }
         return {
@@ -82,13 +82,18 @@ export class AuditService {
         };
 
       case ActionType.UPDATE:
-        if (log.entityType === 'Task') {
-          const changes = [];
-          if (data.title) changes.push(`Title to '${data.title}'`);
-          if (data.description) changes.push(`Description`);
+        if (log.entityType === 'Tasks') {
+          // Check if this is an assignment change
+          if (data.isAssignmentChange || data.changes?.assignedToId || data.assignedToId) {
+            return {
+              action: 'Task Assigned',
+              details: `"${data.title || 'N/A'}" to ${data.assigneeEmail || 'Unassigned'}`,
+            };
+          }
+          // For other updates, use generic message
           return {
             action: 'Task Updated',
-            details: changes.length > 0 ? `Task Updated: ${changes.join(', ')}` : 'Task Updated',
+            details: `"${data.title || 'N/A'}" updated`,
           };
         }
         return {
@@ -97,10 +102,10 @@ export class AuditService {
         };
 
       case ActionType.DELETE:
-        if (log.entityType === 'Task') {
+        if (log.entityType === 'Tasks') {
           return {
             action: 'Task Deleted',
-            details: `Task Deleted: '${data.title || 'N/A'}'`,
+            details: `"${data.title || 'N/A'}"`, // Just title in quotes
           };
         }
         return {
@@ -111,13 +116,14 @@ export class AuditService {
       case ActionType.STATUS_CHANGE:
         return {
           action: 'Status Changed',
-          details: `Status Changed: '${data.title || 'N/A'}' From '${this.formatStatus(data.oldStatus)}' to '${this.formatStatus(data.newStatus)}'`,
+          details: `"${data.title || 'N/A'}" from "${this.formatStatus(data.oldStatus)}" to "${this.formatStatus(data.newStatus)}"`,
         };
 
       case ActionType.ASSIGNMENT_CHANGE:
+        // Keep this for backward compatibility
         return {
-          action: 'Assignment Changed',
-          details: `Assignment Changed: '${data.title || 'N/A'}' To '${data.assigneeEmail || 'Unassigned'}'`,
+          action: 'Task Assigned',
+          details: `"${data.title || 'N/A'}" to ${data.assigneeEmail || 'Unassigned'}`,
         };
 
       default:

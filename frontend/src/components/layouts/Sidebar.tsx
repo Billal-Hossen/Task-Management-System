@@ -27,23 +27,23 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col text-white"
+      className="flex-shrink-0 flex flex-col text-white hidden md:flex"
       style={{
         width: '240px',
         backgroundColor: '#2563eb',
         minHeight: '100vh',
       }}
     >
-      <div className="p-6 border-b" style={{ borderColor: '#1d4ed8' }}>
-        <h1 className="text-xl font-bold">{getSidebarTitle()}</h1>
+      <div className="p-4 sm:p-6 border-b" style={{ borderColor: '#1d4ed8' }}>
+        <h1 className="text-lg sm:text-xl font-bold">{getSidebarTitle()}</h1>
       </div>
 
-      <nav className="flex-1 py-4">
+      <nav className="flex-1 py-4 overflow-y-auto">
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`block px-6 py-3 transition-colors ${
+            className={`block px-4 sm:px-6 py-3 transition-colors text-sm sm:text-base ${
               pathname === item.href
                 ? 'font-bold border-r-4'
                 : 'hover:opacity-90'
@@ -65,7 +65,7 @@ export function Sidebar() {
       <div className="p-4 border-t" style={{ borderColor: '#1d4ed8' }}>
         <Link
           href="/profile"
-          className="block px-6 py-3 hover:opacity-90 transition-colors"
+          className="block px-4 sm:px-6 py-3 hover:opacity-90 transition-colors text-sm sm:text-base"
         >
           Profile
         </Link>

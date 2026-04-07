@@ -75,15 +75,15 @@ export default function AdminDashboardPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="space-y-6 px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-600">Manage tasks and view audit logs</p>
+            <p className="text-gray-600 text-sm sm:text-base">Manage tasks and view audit logs</p>
           </div>
           <button
             onClick={handleOpenCreateModal}
-            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors text-sm sm:text-base w-full sm:w-auto"
           >
             Create Task
           </button>

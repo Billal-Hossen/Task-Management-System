@@ -52,24 +52,78 @@ export class TasksService {
       throw new ForbiddenException('You can only update your assigned tasks');
     }
 
+    // Track if this is an assignment change
+    const isAssignmentChange = updateTaskDto.assignedToId !== undefined &&
+                               updateTaskDto.assignedToId !== task.assignedToId;
+
     Object.assign(task, updateTaskDto);
-    return await this.tasksRepository.save(task);
+    const updatedTask = await this.tasksRepository.save(task);
+
+    // Load relations to get assignee email
+    const taskWithRelations = await this.tasksRepository.findOne({
+      where: { id: updatedTask.id },
+      relations: ['assignedTo'],
+    });
+
+    // Return with additional metadata for audit logging
+    return {
+      ...taskWithRelations,
+      isAssignmentChange,
+    };
   }
 
-  async updateStatus(id: string, status: TaskStatus, actorId: string) {
+  async updateStatus(id: string, status: TaskStatus, actorId: string, actorRole?: UserRole) {
     const task = await this.findOne(id);
 
     if (task.assignedToId !== actorId) {
       throw new ForbiddenException('You can only update your assigned tasks');
     }
 
+    const oldStatus = task.status;
+
+    // Validate status transitions for non-admin users
+    if (actorRole !== UserRole.ADMIN) {
+      const validTransitions = this.getValidTransitions(oldStatus);
+      if (!validTransitions.includes(status)) {
+        throw new ForbiddenException(
+          `Invalid status transition. Cannot change from "${oldStatus}" to "${status}". ` +
+          `Valid transitions from "${oldStatus}": ${validTransitions.map(s => `"${s}"`).join(', ')}`
+        );
+      }
+    }
+
     task.status = status;
-    return await this.tasksRepository.save(task);
+    const updatedTask = await this.tasksRepository.save(task);
+
+    // Return task with oldStatus for audit logging
+    return {
+      ...updatedTask,
+      oldStatus,
+    };
+  }
+
+  private getValidTransitions(currentStatus: TaskStatus): TaskStatus[] {
+    switch (currentStatus) {
+      case TaskStatus.PENDING: // Todo
+        return [TaskStatus.PROCESSING]; // Can only go to In Progress
+      case TaskStatus.PROCESSING: // In Progress
+        return [TaskStatus.DONE, TaskStatus.PENDING]; // Can go to Done or back to Todo
+      case TaskStatus.DONE: // Done
+        return [TaskStatus.PROCESSING]; // Can only go back to In Progress
+      default:
+        return [];
+    }
   }
 
   async delete(id: string, actorId: string) {
     const task = await this.findOne(id);
+    const taskTitle = task.title; // Store title before deletion
     await this.tasksRepository.remove(task);
-    return { message: 'Task deleted successfully' };
+
+    // Return task title for audit logging
+    return {
+      message: 'Task deleted successfully',
+      title: taskTitle,
+    };
   }
 }

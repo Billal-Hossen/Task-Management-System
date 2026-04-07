@@ -55,12 +55,13 @@ export class TasksController {
   @ApiOperation({ summary: 'Update task status' })
   @ApiResponse({ status: 200, description: 'Task status updated successfully' })
   @ApiResponse({ status: 404, description: 'Task not found' })
+  @ApiResponse({ status: 403, description: 'Invalid status transition' })
   updateStatus(
     @Param('id') id: string,
     @Body('status', new ParseEnumPipe(TaskStatus)) status: TaskStatus,
     @Req() req
   ) {
-    return this.tasksService.updateStatus(id, status, req.user.userId);
+    return this.tasksService.updateStatus(id, status, req.user.userId, req.user.role);
   }
 
   @Delete(':id')

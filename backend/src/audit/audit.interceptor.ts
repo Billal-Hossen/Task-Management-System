@@ -65,6 +65,15 @@ export class AuditInterceptor implements NestInterceptor {
               method,
               body: request.body,
               response: typeof response === 'object' ? response : { success: true },
+              // ADDITION: Extract task-specific data for better formatting
+              ...(entityType === 'Tasks' && {
+                title: response?.title || request.body?.title || response?.task?.title,
+                oldStatus: response?.oldStatus,
+                newStatus: response?.status || request.body?.status,
+                assignedToId: response?.assignedToId || request.body?.assignedToId,
+                assigneeEmail: response?.assignedTo?.email || response?.assignedTo?.email,
+                isAssignmentChange: response?.isAssignmentChange,
+              }),
             },
           });
         }
