@@ -6,6 +6,7 @@ import { MainLayout } from '@/components/layouts/MainLayout';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Task } from '@/types';
+import { getStatusLabel, getValidTransitions } from '@/utils/statusHelpers';
 
 export default function UserDashboardPage() {
   const router = useRouter();
@@ -65,39 +66,6 @@ export default function UserDashboardPage() {
       setOpenDropdownId(null);
     } catch (error: any) {
       alert(error.message || 'Failed to update task status');
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'TODO':
-        return 'Todo';
-      case 'PENDING':
-        return 'Pending';
-      case 'PROCESSING':
-        return 'In Progress';
-      case 'DONE':
-        return 'Done';
-      default:
-        return status;
-    }
-  };
-
-  const getValidTransitions = (currentStatus: string): typeof tasks => {
-    switch (currentStatus) {
-      case 'TODO': // Todo
-        return [
-          { status: 'PROCESSING', label: 'In Progress' }
-        ];
-      case 'PROCESSING': // In Progress
-        return [
-          { status: 'DONE', label: 'Done' },
-          { status: 'TODO', label: 'Todo' }
-        ];
-      case 'DONE': // Done
-        return [{ status: 'PROCESSING', label: 'In Progress' }];
-      default:
-        return [];
     }
   };
 

@@ -71,9 +71,17 @@ export class AuditService {
     switch (log.actionType) {
       case ActionType.CREATE:
         if (log.entityType === 'Tasks') {
+          // If task was created with an assignee, show assignment in details
+          if (data.assignedToId || data.assigneeName) {
+            return {
+              action: 'Task Created',
+              details: `"${data.title || 'N/A'}" to ${data.assigneeName || 'Unassigned'}`,
+            };
+          }
+          // Task created without assignee
           return {
             action: 'Task Created',
-            details: `"${data.title || 'N/A'}"`, // Just title in quotes
+            details: `"${data.title || 'N/A'}"`,
           };
         }
         return {

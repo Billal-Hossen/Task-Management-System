@@ -54,8 +54,14 @@ export class TasksService {
 
     const savedTask = await this.tasksRepository.save(task);
 
+    // Load relations to get assignee name for audit log
+    const taskWithRelations = await this.tasksRepository.findOne({
+      where: { id: savedTask.id },
+      relations: ['assignedTo'],
+    });
+
     // If task was assigned during creation, create an additional audit log for assignment
-    if (createTaskDto.assignedToId) {
+    if (createTaskDto.assignedToId && taskWithRelations) {
       await this.auditService.logAction({
         actorId,
         actionType: ActionType.ASSIGNMENT_CHANGE,
@@ -64,13 +70,14 @@ export class TasksService {
         relevantData: {
           title: savedTask.title,
           assignedToId: createTaskDto.assignedToId,
-          assigneeName: savedTask.assignedTo?.name,
+          assigneeName: taskWithRelations.assignedTo?.name,
           newlyCreated: true,
         },
       });
     }
 
-    return savedTask;
+    // Return task with assignee name for audit interceptor
+    return taskWithRelations || savedTask;
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, actorId: string, actorRole: UserRole) {

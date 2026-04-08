@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Task, UpdateTaskDto } from '@/types';
+import { Task, UpdateTaskDto, User } from '@/types';
 import { api } from '@/lib/api';
 
 interface EditTaskModalProps {
@@ -18,7 +18,7 @@ export function EditTaskModal({ isOpen, onClose, onTaskUpdated, task }: EditTask
     status: 'PENDING',
     assignedToId: undefined,
   });
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingUsers, setFetchingUsers] = useState(false);
 

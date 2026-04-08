@@ -110,11 +110,11 @@ class ApiClient {
   }
 
   // User endpoints
-  async getUsers(): Promise<any[]> {
+  async getUsers(): Promise<User[]> {
     return this.request('/users');
   }
 
-  async getAssignableUsers(): Promise<any[]> {
+  async getAssignableUsers(): Promise<User[]> {
     return this.request('/users/assignable');
   }
 }

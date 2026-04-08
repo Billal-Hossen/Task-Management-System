@@ -2,6 +2,7 @@
 
 import { Task, TaskStatus } from '@/types';
 import { api } from '@/lib/api';
+import { StatusBadge } from '@/components/common/StatusBadge';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -24,61 +25,6 @@ export function TaskTable({ tasks, onRefresh, onEditTask }: TaskTableProps) {
           alert(error.message || 'Failed to delete task');
         }
       }
-    }
-  };
-
-  const getStatusBadge = (status?: TaskStatus) => {
-    if (!status) {
-      return {
-        label: 'Unknown',
-        style: {
-          backgroundColor: '#e5e7eb',
-          color: '#374151',
-        },
-      };
-    }
-
-    switch (status) {
-      case 'TODO':
-        return {
-          label: 'Todo',
-          style: {
-            backgroundColor: '#d1fae5',
-            color: '#065f46',
-          },
-        };
-      case 'PENDING':
-        return {
-          label: 'Pending',
-          style: {
-            backgroundColor: '#fef3c7',
-            color: '#92400e',
-          },
-        };
-      case 'PROCESSING':
-        return {
-          label: 'In Progress',
-          style: {
-            backgroundColor: '#bfdbfe',
-            color: '#1e40af',
-          },
-        };
-      case 'DONE':
-        return {
-          label: 'Done',
-          style: {
-            backgroundColor: '#d1fae5',
-            color: '#065f46',
-          },
-        };
-      default:
-        return {
-          label: status,
-          style: {
-            backgroundColor: '#e5e7eb',
-            color: '#374151',
-          },
-        };
     }
   };
 
@@ -115,12 +61,7 @@ export function TaskTable({ tasks, onRefresh, onEditTask }: TaskTableProps) {
                   </div>
                 </td>
                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                  <span
-                    className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    style={getStatusBadge(task?.status)?.style}
-                  >
-                    {getStatusBadge(task?.status)?.label || task?.status || 'Unknown'}
-                  </span>
+                  <StatusBadge status={task?.status} />
                 </td>
                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex flex-col sm:flex-row gap-2">

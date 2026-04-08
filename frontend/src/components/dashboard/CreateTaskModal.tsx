@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CreateTaskDto } from '@/types';
+import { CreateTaskDto, User } from '@/types';
 import { api } from '@/lib/api';
 
 interface CreateTaskModalProps {
@@ -19,7 +19,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
     // - PENDING (Todo) if no assignee
     // - PROCESSING (In Progress) if assigned
   });
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingUsers, setFetchingUsers] = useState(false);
 
