@@ -18,7 +18,9 @@ export function Header() {
 
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-600">
-            <span className="font-medium">{user?.email}</span>
+            <span className="font-medium">{user?.name}</span>
+            <span className="text-gray-400 mx-2">•</span>
+            <span className="text-gray-500">{user?.email}</span>
             <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
               {user?.role}
             </span>

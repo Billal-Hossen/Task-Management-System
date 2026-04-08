@@ -33,7 +33,7 @@ export class AuditService {
 
   private formatAuditLog(log: AuditLog) {
     const timestamp = this.formatTimestamp(log.createdAt);
-    const username = log.actor.email.split('@')[0];
+    const username = log.actor.name || log.actor.email.split('@')[0];
     const { action, details } = this.formatActionAndDetails(log);
 
     return {
@@ -87,7 +87,7 @@ export class AuditService {
           if (data.isAssignmentChange || data.changes?.assignedToId || data.assignedToId) {
             return {
               action: 'Task Assigned',
-              details: `"${data.title || 'N/A'}" to ${data.assigneeEmail || 'Unassigned'}`,
+              details: `"${data.title || 'N/A'}" to ${data.assigneeName || 'Unassigned'}`,
             };
           }
           // For other updates, use generic message
@@ -123,7 +123,7 @@ export class AuditService {
         // Keep this for backward compatibility
         return {
           action: 'Task Assigned',
-          details: `"${data.title || 'N/A'}" to ${data.assigneeEmail || 'Unassigned'}`,
+          details: `"${data.title || 'N/A'}" to ${data.assigneeName || 'Unassigned'}`,
         };
 
       default:

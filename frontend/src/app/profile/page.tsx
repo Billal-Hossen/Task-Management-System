@@ -31,6 +31,13 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
+              <div className="text-sm text-gray-900">{user.name}</div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <div className="text-sm text-gray-900 break-all">{user.email}</div>

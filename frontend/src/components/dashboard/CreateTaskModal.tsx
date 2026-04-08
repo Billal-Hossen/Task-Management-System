@@ -29,7 +29,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
       if (isOpen && users.length === 0) {
         try {
           setFetchingUsers(true);
-          const usersData = await api.getUsers();
+          const usersData = await api.getAssignableUsers();
           setUsers(usersData);
         } catch (error: any) {
           console.error('Failed to fetch users:', error);
@@ -169,7 +169,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
               <option value="">Unassigned</option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.email} ({user.role})
+                  {user.name}
                 </option>
               ))}
             </select>

@@ -44,7 +44,7 @@ export class TasksService {
     // Set status based on whether task is assigned
     // Unassigned tasks → PENDING (Pending)
     // Assigned tasks → TODO (Todo)
-    const taskStatus = createTaskDto.assignedToId ? TaskStatus.PENDING : TaskStatus.TODO;
+    const taskStatus = createTaskDto.assignedToId ? TaskStatus.TODO : TaskStatus.PENDING;
 
     const task = this.tasksRepository.create({
       ...createTaskDto,
@@ -64,7 +64,7 @@ export class TasksService {
         relevantData: {
           title: savedTask.title,
           assignedToId: createTaskDto.assignedToId,
-          assigneeEmail: savedTask.assignedTo?.email,
+          assigneeName: savedTask.assignedTo?.name,
           newlyCreated: true,
         },
       });
@@ -132,12 +132,14 @@ export class TasksService {
 
   private getValidTransitions(currentStatus: TaskStatus): TaskStatus[] {
     switch (currentStatus) {
-      case TaskStatus.PENDING: // Todo
+      case TaskStatus.TODO: // Todo
         return [TaskStatus.PROCESSING]; // Can only go to In Progress
       case TaskStatus.PROCESSING: // In Progress
-        return [TaskStatus.DONE, TaskStatus.PENDING]; // Can go to Done or back to Todo
+        return [TaskStatus.DONE, TaskStatus.TODO]; // Can go to Done or back to Todo
       case TaskStatus.DONE: // Done
         return [TaskStatus.PROCESSING]; // Can only go back to In Progress
+      case TaskStatus.PENDING: // Pending
+        return [TaskStatus.TODO]; // Can only go to Todo (when assigned)
       default:
         return [];
     }

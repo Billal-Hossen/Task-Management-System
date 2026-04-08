@@ -26,7 +26,9 @@ export default function UserDashboardPage() {
   const fetchData = async () => {
     try {
       const tasksData = await api.getTasks();
-      setTasks(tasksData);
+      // Filter out PENDING tasks - users should only see TODO, PROCESSING, DONE
+      const filteredTasks = tasksData.filter(task => task.status !== 'PENDING');
+      setTasks(filteredTasks);
     } catch (error: any) {
       // Silently ignore "No authentication token" errors (happens during logout)
       if (error.message !== 'No authentication token') {
@@ -52,8 +54,15 @@ export default function UserDashboardPage() {
   const handleStatusChange = async (taskId: string, newStatus: 'PENDING' | 'PROCESSING' | 'DONE') => {
     try {
       await api.updateTaskStatus(taskId, newStatus);
+
+      // Update local state immediately for instant UI feedback
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+        )
+      );
+
       setOpenDropdownId(null);
-      fetchData();
     } catch (error: any) {
       alert(error.message || 'Failed to update task status');
     }
@@ -76,12 +85,9 @@ export default function UserDashboardPage() {
 
   const getValidTransitions = (currentStatus: string): typeof tasks => {
     switch (currentStatus) {
-      case 'PENDING': // Pending
-        return [{ status: 'TODO', label: 'Todo' }];
       case 'TODO': // Todo
         return [
-          { status: 'PROCESSING', label: 'In Progress' },
-          { status: 'PENDING', label: 'Pending' }
+          { status: 'PROCESSING', label: 'In Progress' }
         ];
       case 'PROCESSING': // In Progress
         return [
@@ -114,7 +120,7 @@ export default function UserDashboardPage() {
 
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">My Tasks</h2>
-          <div className="bg-white rounded-lg shadow-panel overflow-x-auto">
+          <div className="bg-white rounded-lg shadow-panel overflow-x-auto" style={{ minHeight: '400px' }}>
             <div className="min-w-full">
               <table className="w-full">
                 <thead className="bg-gray-50">

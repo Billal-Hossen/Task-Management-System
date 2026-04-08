@@ -111,7 +111,7 @@ export function TaskTable({ tasks, onRefresh, onEditTask }: TaskTableProps) {
                 </td>
                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                   <div className="text-sm text-gray-900">
-                    {task?.assignedTo?.email || 'Unassigned'}
+                    {task?.assignedTo?.name || task?.assignedTo?.email || 'Unassigned'}
                   </div>
                 </td>
                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap">

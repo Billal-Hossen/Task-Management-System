@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,14 +12,23 @@ export class UsersService {
 
   async findAll() {
     return this.usersRepository.find({
-      select: ['id', 'email', 'role', 'createdAt', 'updatedAt'],
+      select: ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findAssignableUsers() {
+    return this.usersRepository.find({
+      select: ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'],
+      where: { role: UserRole.USER }, // Only return non-admin users for task assignment
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string) {
     const user = await this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'email', 'role', 'createdAt', 'updatedAt'],
+      select: ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'],
     });
 
     if (!user) {

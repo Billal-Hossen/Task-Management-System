@@ -28,7 +28,7 @@ export function EditTaskModal({ isOpen, onClose, onTaskUpdated, task }: EditTask
       if (isOpen && users.length === 0) {
         try {
           setFetchingUsers(true);
-          const usersData = await api.getUsers();
+          const usersData = await api.getAssignableUsers();
           setUsers(usersData);
         } catch (error: any) {
           console.error('Failed to fetch users:', error);
@@ -86,10 +86,25 @@ export function EditTaskModal({ isOpen, onClose, onTaskUpdated, task }: EditTask
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      // Auto-update status based on assignee (for admin)
+      if (name === 'assignedToId') {
+        if (value) {
+          // Task is assigned → set to TODO
+          updated.status = 'TODO';
+        } else {
+          // Task is unassigned → set to PENDING
+          updated.status = 'PENDING';
+        }
+      }
+
+      return updated;
+    });
   };
 
   if (!isOpen) return null;
@@ -182,7 +197,7 @@ export function EditTaskModal({ isOpen, onClose, onTaskUpdated, task }: EditTask
               <option value="">Unassigned</option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.email} ({user.role})
+                  {user.name}
                 </option>
               ))}
             </select>

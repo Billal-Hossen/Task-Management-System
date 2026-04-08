@@ -90,9 +90,16 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-sm text-gray-600">
-          <p className="font-semibold">Demo credentials:</p>
-          <p>Admin: admin@taskmanager.com / Admin123!</p>
-          <p>User: user@taskmanager.com / User123!</p>
+          <p className="font-semibold mb-2">Demo credentials:</p>
+          <div className="space-y-1">
+            <p className="font-medium text-gray-700">Admin Account:</p>
+            <p className="text-xs">admin@taskmanager.com / Admin123!</p>
+            <p className="font-medium text-gray-700 mt-2">User Accounts:</p>
+            <p className="text-xs">john.doe@taskmanager.com / User123!</p>
+            <p className="text-xs">jane.smith@taskmanager.com / User123!</p>
+            <p className="text-xs">bob.wilson@taskmanager.com / User123!</p>
+            <p className="text-xs">alice.brown@taskmanager.com / User123!</p>
+          </div>
         </div>
       </div>
     </div>

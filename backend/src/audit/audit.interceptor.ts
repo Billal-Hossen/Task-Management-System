@@ -71,7 +71,7 @@ export class AuditInterceptor implements NestInterceptor {
                 oldStatus: response?.oldStatus,
                 newStatus: response?.status || request.body?.status,
                 assignedToId: response?.assignedToId || request.body?.assignedToId,
-                assigneeEmail: response?.assignedTo?.email || response?.assignedTo?.email,
+                assigneeName: response?.assignedTo?.name || response?.assignedTo?.name,
                 isAssignmentChange: response?.isAssignmentChange,
               }),
             },

@@ -113,6 +113,10 @@ class ApiClient {
   async getUsers(): Promise<any[]> {
     return this.request('/users');
   }
+
+  async getAssignableUsers(): Promise<any[]> {
+    return this.request('/users/assignable');
+  }
 }
 
 export const api = new ApiClient();

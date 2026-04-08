@@ -12,34 +12,61 @@ export class DatabaseSeeder {
   ) {}
 
   async seedUsers() {
-    const existingAdmin = await this.usersRepository.findOne({
-      where: { email: 'admin@taskmanager.com' },
-    });
+    // Check if users already exist
+    const userCount = await this.usersRepository.count();
 
-    if (!existingAdmin) {
-      const adminPassword = await bcrypt.hash('Admin123!', 10);
-      const admin = this.usersRepository.create({
-        email: 'admin@taskmanager.com',
-        password: adminPassword,
-        role: UserRole.ADMIN,
-      });
-      await this.usersRepository.save(admin);
-      console.log('Admin user created: admin@taskmanager.com / Admin123!');
+    if (userCount > 0) {
+      console.log('Users already exist, skipping seed');
+      return;
     }
 
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: 'user@taskmanager.com' },
+    // Create Admin User
+    const adminPassword = await bcrypt.hash('Admin123!', 10);
+    const admin = this.usersRepository.create({
+      email: 'admin@taskmanager.com',
+      name: 'Admin User',
+      password: adminPassword,
+      role: UserRole.ADMIN,
     });
+    await this.usersRepository.save(admin);
+    console.log('Admin user created: admin@taskmanager.com / Admin123!');
 
-    if (!existingUser) {
-      const userPassword = await bcrypt.hash('User123!', 10);
+    // Create Normal Users
+    const normalUsers = [
+      {
+        email: 'john.doe@taskmanager.com',
+        name: 'John Doe',
+        password: 'User123!',
+      },
+      {
+        email: 'jane.smith@taskmanager.com',
+        name: 'Jane Smith',
+        password: 'User123!',
+      },
+      {
+        email: 'bob.wilson@taskmanager.com',
+        name: 'Bob Wilson',
+        password: 'User123!',
+      },
+      {
+        email: 'alice.brown@taskmanager.com',
+        name: 'Alice Brown',
+        password: 'User123!',
+      },
+    ];
+
+    for (const userData of normalUsers) {
+      const userPassword = await bcrypt.hash(userData.password, 10);
       const user = this.usersRepository.create({
-        email: 'user@taskmanager.com',
+        email: userData.email,
+        name: userData.name,
         password: userPassword,
         role: UserRole.USER,
       });
       await this.usersRepository.save(user);
-      console.log('User created: user@taskmanager.com / User123!');
+      console.log(`User created: ${userData.email} / ${userData.password}`);
     }
+
+    console.log(`Seeding completed: 1 Admin + ${normalUsers.length} Users created`);
   }
 }

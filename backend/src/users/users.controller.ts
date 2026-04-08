@@ -16,6 +16,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('assignable')
+  @Roles(UserRole.ADMIN)
+  findAssignable() {
+    return this.usersService.findAssignableUsers();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
