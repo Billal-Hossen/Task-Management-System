@@ -1,23 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CreateTaskDto } from '@/types';
+import { Task, UpdateTaskDto } from '@/types';
 import { api } from '@/lib/api';
 
-interface CreateTaskModalProps {
+interface EditTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onTaskCreated: () => void;
+  onTaskUpdated: () => void;
+  task: Task | null;
 }
 
-export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskModalProps) {
-  const [formData, setFormData] = useState<CreateTaskDto>({
+export function EditTaskModal({ isOpen, onClose, onTaskUpdated, task }: EditTaskModalProps) {
+  const [formData, setFormData] = useState<UpdateTaskDto>({
     title: '',
     description: '',
+    status: 'PENDING',
     assignedToId: undefined,
-    // status will be set automatically by backend:
-    // - PENDING (Todo) if no assignee
-    // - PROCESSING (In Progress) if assigned
   });
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,32 +45,39 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
     fetchUsers();
   }, [isOpen, users.length]);
 
+  // Populate form when task changes
+  useEffect(() => {
+    if (task) {
+      setFormData({
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        assignedToId: task.assignedToId || undefined,
+      });
+    }
+  }, [task]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.description.trim()) {
+    if (!task?.id) return;
+
+    if (!formData.title?.trim() || !formData.description?.trim()) {
       alert('Please fill in all required fields');
       return;
     }
 
     try {
       setLoading(true);
-      await api.createTask(formData);
-      alert('Task created successfully!');
+      await api.updateTask(task.id, formData);
+      alert('Task updated successfully!');
 
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        assignedToId: undefined,
-      });
-
-      onTaskCreated();
+      onTaskUpdated();
       onClose();
     } catch (error: any) {
       // Silently ignore auth errors during logout
       if (error.message !== 'No authentication token') {
-        alert(error.message || 'Failed to create task');
+        alert(error.message || 'Failed to update task');
       }
     } finally {
       setLoading(false);
@@ -92,7 +98,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Edit Task</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -105,15 +111,6 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Info Message */}
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
-            <p className="text-sm text-blue-800">
-              💡 Task status is set automatically:
-              <br />• <strong>Unassigned</strong> → Pending
-              <br />• <strong>Assigned</strong> → Todo
-            </p>
-          </div>
-
           {/* Title Field */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
@@ -150,14 +147,30 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
             />
           </div>
 
+          {/* Status Field */}
+          <div>
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={loading}
+            >
+              <option value="PENDING">Pending</option>
+              <option value="PROCESSING">Processing</option>
+              <option value="DONE">Done</option>
+            </select>
+          </div>
+
           {/* Assignee Field */}
           <div>
             <label htmlFor="assignedToId" className="block text-sm font-medium text-gray-700 mb-1">
               Assignee
             </label>
-            <div className="text-xs text-gray-500 mb-2">
-              {formData.assignedToId ? 'Task will be set to "Todo"' : 'Task will be set to "Pending"'}
-            </div>
             <select
               id="assignedToId"
               name="assignedToId"
@@ -190,7 +203,7 @@ export function CreateTaskModal({ isOpen, onClose, onTaskCreated }: CreateTaskMo
               disabled={loading}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating...' : 'Create Task'}
+              {loading ? 'Updating...' : 'Update Task'}
             </button>
           </div>
         </form>

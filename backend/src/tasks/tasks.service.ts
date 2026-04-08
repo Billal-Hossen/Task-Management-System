@@ -5,12 +5,15 @@ import { Task, TaskStatus } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UserRole } from '../users/entities/user.entity';
+import { AuditService } from '../audit/audit.service';
+import { ActionType } from '../audit/audit.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private tasksRepository: Repository<Task>,
+    private auditService: AuditService,
   ) {}
 
   async findAll() {
@@ -38,11 +41,36 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto, actorId: string) {
+    // Set status based on whether task is assigned
+    // Unassigned tasks → PENDING (Pending)
+    // Assigned tasks → TODO (Todo)
+    const taskStatus = createTaskDto.assignedToId ? TaskStatus.PENDING : TaskStatus.TODO;
+
     const task = this.tasksRepository.create({
       ...createTaskDto,
+      status: taskStatus,
       createdById: actorId,
     });
-    return await this.tasksRepository.save(task);
+
+    const savedTask = await this.tasksRepository.save(task);
+
+    // If task was assigned during creation, create an additional audit log for assignment
+    if (createTaskDto.assignedToId) {
+      await this.auditService.logAction({
+        actorId,
+        actionType: ActionType.ASSIGNMENT_CHANGE,
+        entityType: 'Tasks',
+        entityId: savedTask.id,
+        relevantData: {
+          title: savedTask.title,
+          assignedToId: createTaskDto.assignedToId,
+          assigneeEmail: savedTask.assignedTo?.email,
+          newlyCreated: true,
+        },
+      });
+    }
+
+    return savedTask;
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, actorId: string, actorRole: UserRole) {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { TaskTable } from '@/components/dashboard/TaskTable';
 import { CreateTaskModal } from '@/components/dashboard/CreateTaskModal';
+import { EditTaskModal } from '@/components/dashboard/EditTaskModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Task } from '@/types';
@@ -15,6 +16,8 @@ export default function AdminDashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -50,6 +53,20 @@ export default function AdminDashboardPage() {
 
   const handleTaskCreated = () => {
     fetchData(); // Refresh data to show the new task
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingTask(null);
+  };
+
+  const handleTaskUpdated = () => {
+    fetchData(); // Refresh data to show updated task
   };
 
   useEffect(() => {
@@ -92,7 +109,7 @@ export default function AdminDashboardPage() {
         {/* Task List - Main Section */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Tasks</h2>
-          <TaskTable tasks={tasks} onRefresh={fetchData} />
+          <TaskTable tasks={tasks} onRefresh={fetchData} onEditTask={handleEditTask} />
         </div>
       </div>
 
@@ -101,6 +118,14 @@ export default function AdminDashboardPage() {
         isOpen={isCreateModalOpen}
         onClose={handleCloseCreateModal}
         onTaskCreated={handleTaskCreated}
+      />
+
+      {/* Edit Task Modal */}
+      <EditTaskModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onTaskUpdated={handleTaskUpdated}
+        task={editingTask}
       />
     </MainLayout>
   );

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { User } from '../../users/entities/user.entity';
 
 export enum TaskStatus {
+  TODO = 'TODO',
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   DONE = 'DONE',

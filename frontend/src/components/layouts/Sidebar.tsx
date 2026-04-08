@@ -19,7 +19,7 @@ export function Sidebar() {
   ];
 
   const userNavItems = [
-    { label: 'User Dashboard', href: '/user/dashboard' },
+    // { label: 'User Dashboard', href: '/user/dashboard' },
     { label: 'My Tasks', href: '/user/dashboard' },
   ];
 

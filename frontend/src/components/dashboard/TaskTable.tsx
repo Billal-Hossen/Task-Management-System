@@ -6,9 +6,10 @@ import { api } from '@/lib/api';
 interface TaskTableProps {
   tasks: Task[];
   onRefresh: () => void;
+  onEditTask?: (task: Task) => void;
 }
 
-export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
+export function TaskTable({ tasks, onRefresh, onEditTask }: TaskTableProps) {
   const handleDelete = async (id: string) => {
     if (!id) return;
 
@@ -38,11 +39,19 @@ export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
     }
 
     switch (status) {
-      case 'PENDING':
+      case 'TODO':
         return {
           label: 'Todo',
           style: {
-            backgroundColor: '#fed7aa',
+            backgroundColor: '#d1fae5',
+            color: '#065f46',
+          },
+        };
+      case 'PENDING':
+        return {
+          label: 'Pending',
+          style: {
+            backgroundColor: '#fef3c7',
             color: '#92400e',
           },
         };
@@ -50,8 +59,8 @@ export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
         return {
           label: 'In Progress',
           style: {
-            backgroundColor: '#d1fae5',
-            color: '#065f46',
+            backgroundColor: '#bfdbfe',
+            color: '#1e40af',
           },
         };
       case 'DONE':
@@ -116,6 +125,7 @@ export function TaskTable({ tasks, onRefresh }: TaskTableProps) {
                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex flex-col sm:flex-row gap-2">
                     <button
+                      onClick={() => task && onEditTask?.(task)}
                       className="px-3 py-1 rounded text-white font-medium text-xs sm:text-sm"
                       style={{
                         backgroundColor: '#2563eb',

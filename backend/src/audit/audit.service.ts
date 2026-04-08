@@ -136,7 +136,8 @@ export class AuditService {
 
   private formatStatus(status: string): string {
     const statusMap: Record<string, string> = {
-      'PENDING': 'Todo',
+      'TODO': 'Todo',
+      'PENDING': 'Pending',
       'PROCESSING': 'In Progress',
       'DONE': 'Done',
     };

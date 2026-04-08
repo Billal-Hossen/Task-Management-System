@@ -61,8 +61,10 @@ export default function UserDashboardPage() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'PENDING':
+      case 'TODO':
         return 'Todo';
+      case 'PENDING':
+        return 'Pending';
       case 'PROCESSING':
         return 'In Progress';
       case 'DONE':
@@ -74,15 +76,20 @@ export default function UserDashboardPage() {
 
   const getValidTransitions = (currentStatus: string): typeof tasks => {
     switch (currentStatus) {
-      case 'PENDING': // Todo
-        return tasks.filter(t => t.status === 'PROCESSING').map(t => ({ status: 'PROCESSING', label: 'In Progress' }));
+      case 'PENDING': // Pending
+        return [{ status: 'TODO', label: 'Todo' }];
+      case 'TODO': // Todo
+        return [
+          { status: 'PROCESSING', label: 'In Progress' },
+          { status: 'PENDING', label: 'Pending' }
+        ];
       case 'PROCESSING': // In Progress
         return [
           { status: 'DONE', label: 'Done' },
-          { status: 'PENDING', label: 'Todo' }
+          { status: 'TODO', label: 'Todo' }
         ];
       case 'DONE': // Done
-        return tasks.filter(t => t.status === 'PROCESSING').map(t => ({ status: 'PROCESSING', label: 'In Progress' }));
+        return [{ status: 'PROCESSING', label: 'In Progress' }];
       default:
         return [];
     }
