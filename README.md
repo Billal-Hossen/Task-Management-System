@@ -6,7 +6,7 @@ A complete task management system with team collaboration, role-based access, an
 
 ## 🚀 Quick Start
 
-### **Get Started in 3 Steps**
+### **Get Started in 4 Steps (Error-Free)**
 
 1. **Clone and navigate to project**
    ```bash
@@ -14,12 +14,21 @@ A complete task management system with team collaboration, role-based access, an
    cd Task-Management-System
    ```
 
-2. **Start the application**
+2. **Setup environment variables** (REQUIRED - prevents startup errors)
+   ```bash
+   # Create main environment file
+   cp .env.example .env
+   
+   # Create frontend environment file  
+   echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > frontend/.env.local
+   ```
+
+3. **Start the application**
    ```bash
    docker-compose up -d
    ```
 
-3. **Access the application**
+4. **Access the application**
    - **Frontend**: http://localhost:3000
    - **Backend API**: http://localhost:3001
    - **API Documentation**: http://localhost:3001/api
@@ -137,12 +146,21 @@ The system uses three main tables that work together:
    cd task-management-system
    ```
 
-2. **Start all services**
+2. **Setup environment files** (IMPORTANT - prevents connection errors)
+   ```bash
+   # Create main environment file
+   cp .env.example .env
+
+   # Create frontend environment file
+   echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > frontend/.env.local
+   ```
+
+3. **Start all services**
    ```bash
    docker-compose up -d
    ```
 
-3. **Access the application**
+4. **Access the application**
    - **Frontend**: http://localhost:3000
    - **Backend API**: http://localhost:3001
    - **Swagger Documentation**: http://localhost:3001/api
@@ -299,6 +317,14 @@ task-management-system/
 
 ## 💻 Local Development
 
+### **Prerequisites**
+1. **Setup environment files first** (required for both backend and frontend):
+   ```bash
+   # From project root
+   cp .env.example .env
+   echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > frontend/.env.local
+   ```
+
 ### **Backend Only**
 ```bash
 cd backend
@@ -353,6 +379,22 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ---
 
 ## 🐛 Troubleshooting
+
+### **"Site Can't Be Reached" or Connection Errors**
+**Problem**: Browser shows "This site can't be reached" at http://localhost:3000
+
+**Solution**: Environment files are missing. Run these commands:
+```bash
+# Create main environment file
+cp .env.example .env
+
+# Create frontend environment file  
+echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > frontend/.env.local
+
+# Restart containers
+docker-compose down
+docker-compose up -d
+```
 
 ### **Port Already in Use**
 ```bash
@@ -430,6 +472,22 @@ docker-compose logs
 ---
 
 ## 🐛 Troubleshooting
+
+### **"Site Can't Be Reached" or Connection Errors**
+**Problem**: Browser shows "This site can't be reached" at http://localhost:3000
+
+**Solution**: Environment files are missing. Run these commands:
+```bash
+# Create main environment file
+cp .env.example .env
+
+# Create frontend environment file  
+echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > frontend/.env.local
+
+# Restart containers
+docker-compose down
+docker-compose up -d
+```
 
 ### **Port Already in Use**
 ```bash
