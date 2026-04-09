@@ -7,7 +7,7 @@ export interface User {
   updatedAt: string;
 }
 
-export type TaskStatus = 'PENDING' | 'PROCESSING' | 'DONE';
+export type TaskStatus = 'PENDING' | 'TODO' | 'PROCESSING' | 'DONE';
 
 export interface Task {
   id: string;
