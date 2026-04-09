@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, ParseEnumPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+  ParseEnumPipe,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -59,7 +70,7 @@ export class TasksController {
   updateStatus(
     @Param('id') id: string,
     @Body('status', new ParseEnumPipe(TaskStatus)) status: TaskStatus,
-    @Req() req
+    @Req() req,
   ) {
     return this.tasksService.updateStatus(id, status, req.user.userId, req.user.role);
   }

@@ -5,7 +5,7 @@ export class LoginDto {
   @ApiProperty({
     example: 'admin@taskmanager.com',
     description: 'User email address',
-    format: 'email'
+    format: 'email',
   })
   @IsEmail()
   email: string;
@@ -13,7 +13,7 @@ export class LoginDto {
   @ApiProperty({
     example: 'Admin123!',
     description: 'User password (min 6 characters)',
-    minLength: 6
+    minLength: 6,
   })
   @IsNotEmpty()
   @MinLength(6)

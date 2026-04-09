@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { AuditLogTable } from '@/components/dashboard/AuditLogTable';
@@ -21,7 +21,7 @@ export default function AuditLogsPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const logsData = await api.getAuditLogs();
       setAuditLogs(logsData);
@@ -34,13 +34,13 @@ export default function AuditLogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
       fetchData();
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isAdmin, fetchData]);
 
   // Don't render if redirecting
   if (!isAuthenticated || !isAdmin) {

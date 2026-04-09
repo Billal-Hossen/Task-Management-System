@@ -88,8 +88,8 @@ export class TasksService {
     }
 
     // Track if this is an assignment change
-    const isAssignmentChange = updateTaskDto.assignedToId !== undefined &&
-                               updateTaskDto.assignedToId !== task.assignedToId;
+    const isAssignmentChange =
+      updateTaskDto.assignedToId !== undefined && updateTaskDto.assignedToId !== task.assignedToId;
 
     Object.assign(task, updateTaskDto);
     const updatedTask = await this.tasksRepository.save(task);
@@ -122,7 +122,7 @@ export class TasksService {
       if (!validTransitions.includes(status)) {
         throw new ForbiddenException(
           `Invalid status transition. Cannot change from "${oldStatus}" to "${status}". ` +
-          `Valid transitions from "${oldStatus}": ${validTransitions.map(s => `"${s}"`).join(', ')}`
+            `Valid transitions from "${oldStatus}": ${validTransitions.map((s) => `"${s}"`).join(', ')}`,
         );
       }
     }
@@ -152,7 +152,7 @@ export class TasksService {
     }
   }
 
-  async delete(id: string, actorId: string) {
+  async delete(id: string, _actorId: string) {
     const task = await this.findOne(id);
     const taskTitle = task.title; // Store title before deletion
     await this.tasksRepository.remove(task);

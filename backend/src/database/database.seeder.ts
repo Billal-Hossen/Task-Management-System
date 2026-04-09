@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../users/entities/user.entity';
@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DatabaseSeeder {
+  private readonly logger = new Logger(DatabaseSeeder.name);
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -16,7 +18,7 @@ export class DatabaseSeeder {
     const userCount = await this.usersRepository.count();
 
     if (userCount > 0) {
-      console.log('Users already exist, skipping seed');
+      this.logger.log('Users already exist, skipping seed');
       return;
     }
 
@@ -29,7 +31,7 @@ export class DatabaseSeeder {
       role: UserRole.ADMIN,
     });
     await this.usersRepository.save(admin);
-    console.log('Admin user created: admin@taskmanager.com / Admin123!');
+    this.logger.log('Admin user created: admin@taskmanager.com / Admin123!');
 
     // Create Normal Users
     const normalUsers = [
@@ -64,9 +66,9 @@ export class DatabaseSeeder {
         role: UserRole.USER,
       });
       await this.usersRepository.save(user);
-      console.log(`User created: ${userData.email} / ${userData.password}`);
+      this.logger.log(`User created: ${userData.email} / ${userData.password}`);
     }
 
-    console.log(`Seeding completed: 1 Admin + ${normalUsers.length} Users created`);
+    this.logger.log(`Seeding completed: 1 Admin + ${normalUsers.length} Users created`);
   }
 }

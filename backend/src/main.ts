@@ -1,17 +1,20 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
 
   // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Enable CORS
   app.enableCors({
@@ -31,8 +34,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT || 3001);
-  console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`API documentation available at: ${await app.getUrl()}/api`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`API documentation available at: ${await app.getUrl()}/api`);
 }
 
 bootstrap();

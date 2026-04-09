@@ -1,6 +1,6 @@
 'use client';
 
-import { Task, TaskStatus } from '@/types';
+import { Task } from '@/types';
 import { api } from '@/lib/api';
 import { StatusBadge } from '@/components/common/StatusBadge';
 

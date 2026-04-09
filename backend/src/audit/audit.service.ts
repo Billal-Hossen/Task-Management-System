@@ -15,7 +15,7 @@ export class AuditService {
     actionType: ActionType;
     entityType: string;
     entityId: string;
-    relevantData: Record<string, any>;
+    relevantData: Record<string, unknown>;
   }) {
     const auditLog = this.auditRepository.create(data);
     return this.auditRepository.save(auditLog);
@@ -28,7 +28,7 @@ export class AuditService {
       take: 100,
     });
 
-    return logs.map(log => this.formatAuditLog(log));
+    return logs.map((log) => this.formatAuditLog(log));
   }
 
   private formatAuditLog(log: AuditLog) {
@@ -66,7 +66,7 @@ export class AuditService {
   }
 
   private formatActionAndDetails(log: AuditLog): { action: string; details: string } {
-    const data = log.relevantData || {};
+    const data = log.relevantData as Record<string, any> || {};
 
     switch (log.actionType) {
       case ActionType.CREATE:
@@ -124,7 +124,7 @@ export class AuditService {
       case ActionType.STATUS_CHANGE:
         return {
           action: 'Status Changed',
-          details: `"${data.title || 'N/A'}" from "${this.formatStatus(data.oldStatus)}" to "${this.formatStatus(data.newStatus)}"`,
+          details: `"${data.title || 'N/A'}" from "${this.formatStatus(String(data.oldStatus))}" to "${this.formatStatus(String(data.newStatus))}"`,
         };
 
       case ActionType.ASSIGNMENT_CHANGE:
@@ -144,10 +144,10 @@ export class AuditService {
 
   private formatStatus(status: string): string {
     const statusMap: Record<string, string> = {
-      'TODO': 'Todo',
-      'PENDING': 'Pending',
-      'PROCESSING': 'In Progress',
-      'DONE': 'Done',
+      TODO: 'Todo',
+      PENDING: 'Pending',
+      PROCESSING: 'In Progress',
+      DONE: 'Done',
     };
     return statusMap[status] || status;
   }
@@ -159,6 +159,6 @@ export class AuditService {
       order: { createdAt: 'DESC' },
     });
 
-    return logs.map(log => this.formatAuditLog(log));
+    return logs.map((log) => this.formatAuditLog(log));
   }
 }

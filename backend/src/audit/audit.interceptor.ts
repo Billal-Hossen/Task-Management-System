@@ -12,7 +12,7 @@ export class AuditInterceptor implements NestInterceptor {
     private reflector: Reflector,
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const handler = context.getHandler();
 

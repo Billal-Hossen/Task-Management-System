@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../users/entities/user.entity';
 
 export enum ActionType {
@@ -34,7 +41,7 @@ export class AuditLog {
   entityId: string;
 
   @Column('jsonb', { name: 'relevant_data' })
-  relevantData: Record<string, any>;
+  relevantData: Record<string, unknown>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

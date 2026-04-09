@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { api } from '@/lib/api';
@@ -24,7 +24,7 @@ export default function UserDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const tasksData = await api.getTasks();
       // Filter out PENDING tasks - users should only see TODO, PROCESSING, DONE
@@ -39,13 +39,13 @@ export default function UserDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated && !isAdmin) {
       fetchData();
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isAdmin, fetchData]);
 
   // Don't render if redirecting
   if (!isAuthenticated || isAdmin) {
