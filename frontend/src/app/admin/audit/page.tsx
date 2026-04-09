@@ -10,16 +10,18 @@ import { AuditLog } from '@/types';
 
 export default function AuditLogsPage() {
   const router = useRouter();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading } = useAuth();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect to login if not authenticated or not admin
+  // Redirect to login if not authenticated or not admin (after loading completes)
   useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      router.push('/login');
+    if (!isLoading) {
+      if (!isAuthenticated || !isAdmin) {
+        router.push('/login');
+      }
     }
-  }, [isAuthenticated, isAdmin, router]);
+  }, [isAuthenticated, isAdmin, isLoading, router]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -42,8 +44,8 @@ export default function AuditLogsPage() {
     }
   }, [isAuthenticated, isAdmin, fetchData]);
 
-  // Don't render if redirecting
-  if (!isAuthenticated || !isAdmin) {
+  // Don't render if loading auth or if redirecting
+  if (isLoading || !isAuthenticated || !isAdmin) {
     return null;
   }
 

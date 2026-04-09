@@ -7,15 +7,15 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
-  if (!isAuthenticated || !user) {
+  if (isLoading || !isAuthenticated || !user) {
     return null;
   }
 

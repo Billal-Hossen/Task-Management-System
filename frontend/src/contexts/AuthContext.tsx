@@ -12,6 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoggingOut: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Load user from localStorage on mount
@@ -42,6 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error loading user from localStorage:', error);
+    } finally {
+      // Mark loading as complete regardless of outcome
+      setIsLoading(false);
     }
   }, []);
 
@@ -90,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user && !isLoggingOut,
         isAdmin: user?.role === 'ADMIN',
         isLoggingOut,
+        isLoading,
       }}
     >
       {children}

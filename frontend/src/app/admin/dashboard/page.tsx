@@ -12,21 +12,23 @@ import { Task } from '@/types';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (after loading completes)
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    } else if (!isAdmin) {
-      router.push('/user/dashboard');
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.push('/login');
+      } else if (!isAdmin) {
+        router.push('/user/dashboard');
+      }
     }
-  }, [isAuthenticated, isAdmin, router]);
+  }, [isAuthenticated, isAdmin, isLoading, router]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -75,8 +77,8 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, fetchData]);
 
-  // Don't render if redirecting
-  if (!isAuthenticated || !isAdmin) {
+  // Don't render if loading auth or if redirecting
+  if (isLoading || !isAuthenticated || !isAdmin) {
     return null;
   }
 
