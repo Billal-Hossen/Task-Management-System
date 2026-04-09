@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useLayoutEffect } from 'react';
 import { api } from '@/lib/api';
 import { User } from '@/types';
 
@@ -23,16 +23,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Load user from localStorage on mount
+  useLayoutEffect(() => {
+    // Load user from localStorage on mount (synchronously before paint)
     try {
       const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
 
       if (storedToken && storedUser) {
         try {
+          const parsedUser = JSON.parse(storedUser);
           setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          setUser(parsedUser);
         } catch (parseError) {
           console.error('Error parsing stored user:', parseError);
           // Clear invalid data
